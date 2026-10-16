@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <section id="authPage" class="auth-page">
+    <div class="auth-card">
+      <div class="brand-icon">₹</div>
+      <h1>Smart Expense Tracker</h1>
+      <p class="muted">Manage your money with confidence.</p>
+
+      <div class="auth-tabs">
+        <button id="loginTab" class="tab active" type="button">Login</button>
+        <button id="registerTab" class="tab" type="button">Create Account</button>
+      </div>
+
+      <form id="authForm">
+        <div id="nameGroup" class="field hidden">
+          <label for="authName">Full name</label>
+          <input id="authName" type="text" maxlength="100"
+                 autocomplete="name" placeholder="Your name">
+        </div>
+
+        <div class="field">
+          <label for="authEmail">Email address</label>
+          <input id="authEmail" type="email" maxlength="255"
+                 autocomplete="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="field">
+          <label for="authPassword">Password</label>
+          <input id="authPassword" type="password" minlength="8"
+                 maxlength="72" autocomplete="current-password"
+                 required placeholder="At least 8 characters">
+        </div>
+
+        <button id="authSubmit" class="primary-btn full-width" type="submit">
+          Login
+        </button>
+      </form>
+
+      <p id="authMessage" class="message" role="status"></p>
+      <p class="small muted">Your account is protected by password hashing.</p>
+    </div>
+  </section>
+
+  <div id="appPage" class="app-layout hidden">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <div class="brand-icon small-brand">₹</div>
+        <div>
+          <strong>Smart Expense</strong>
+          <span>TRACKER</span>
+        </div>
+      </div>
+
+      <p class="side-label">MENU</p>
+
+      <nav class="nav-menu">
+        <button class="nav-link active" data-section="dashboardSection">
+          <span>▦</span> Dashboard
+        </button>
+        <button class="nav-link" data-section="addSection">
+          <span>＋</span> Add Transaction
+        </button>
+        <button class="nav-link" data-section="transactionsSection">
+          <span>☷</span> Transactions
+        </button>
+        <button class="nav-link" data-section="reportsSection">
+          <span>◔</span> Reports & Analytics
+        </button>
+        <button class="nav-link" data-section="categorySection">
+          <span>◉</span> Expenses by Category
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <p id="sideUserName">Welcome!</p>
+        <button id="logoutBtn" class="logout-btn">↪ Log out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PERSONAL FINANCE</p>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+
+        <div class="user-chip">
+          <div class="avatar">U</div>
+          <div>
+            <strong id="headerUserName">User</strong>
+            <span id="headerUserEmail">Account</span>
+          </div>
+        </div>
+      </header>
+
+      <div id="appMessage" class="message" role="status"></div>
+
+      <section id="dashboardSection" class="content-section">
+        <div class="welcome-row">
+          <div>
+            <h2>Welcome back, <span id="welcomeName">there</span>!</h2>
+            <p class="muted">Here is your financial overview.</p>
+          </div>
+          <button class="primary-btn" data-go="addSection">+ Add Transaction</button>
+        </div>
+
+        <div class="summary-grid">
+          <article class="summary-card balance-card">
+            <div class="summary-top"><span>Total Balance</span><span>◈</span></div>
+            <h2 id="totalBalance">₹0.00</h2>
+            <p>Income minus expenses</p>
+          </article>
+
+          <article class="summary-card income-card">
+            <div class="summary-top"><span>Total Income</span><span>↗</span></div>
+            <h2 id="totalIncome">₹0.00</h2>
+            <p>Money received</p>
+          </article>
+
+          <article class="summary-card expense-card">
+            <div class="summary-top"><span>Total Expenses</span><span>↘</span></div>
+            <h2 id="totalExpenses">₹0.00</h2>
+            <p>Money spent</p>
+          </article>
+
+          <article class="summary-card count-card">
+            <div class="summary-top"><span>Transactions</span><span>☷</span></div>
+            <h2 id="transactionCount">0</h2>
+            <p>Recorded transactions</p>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <h3>Income vs Expenses</h3>
+                <p class="muted">All recorded transactions</p>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="overviewChart"></canvas></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <h3>Expense Categories</h3>
+                <p class="muted">Where your money goes</p>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="overviewCategoryChart"></canvas></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <h3>Recent Transactions</h3>
+              <p class="muted">Your latest activity</p>
+            </div>
+            <button class="text-btn" data-go="transactionsSection">View all</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th><th>Date</th><th>Type</th><th class="right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="recentTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="addSection" class="content-section hidden">
+        <article class="panel form-panel">
+          <div class="panel-heading">
+            <div>
+              <h3 id="transactionFormTitle">Add a Transaction</h3>
+              <p class="muted">Enter the transaction details below.</p>
+            </div>
+          </div>
+
+          <form id="transactionForm">
+            <input id="editId" type="hidden">
+
+            <div class="field">
+              <label for="transactionType">Transaction type</label>
+              <select id="transactionType" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="transactionAmount">Amount (₹)</label>
+                <input id="transactionAmount" type="number" min="0.01"
+                       max="999999999" step="0.01" required placeholder="0.00">
+              </div>
+
+              <div class="field">
+                <label for="transactionCategory">Category</label>
+                <select id="transactionCategory" required></select>
+              </div>
+
+              <div class="field">
+                <label for="paymentMethod">Payment method</label>
+                <select id="paymentMethod">
+                  <option>UPI</option>
+                  <option>Cash</option>
+                  <option>Debit Card</option>
+                  <option>Credit Card</option>
+                  <option>Bank Transfer</option>
+                  <option>Other</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="transactionDate">Date</label>
+                <input id="transactionDate" type="date" required>
+              </div>
+
+              <div class="field">
+                <label for="transactionNotes">Notes (optional)</label>
+                <input id="transactionNotes" type="text" maxlength="5000"
+                       placeholder="Additional details">
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button id="saveTransactionBtn" class="primary-btn" type="submit">
+                Save Transaction
+              </button>
+              <button id="cancelEditBtn" class="secondary-btn hidden" type="button">
+                Cancel Edit
+              </button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section id="transactionsSection" class="content-section hidden">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <h3>Transaction History</h3>
+              <p class="muted">Search and manage your transactions.</p>
+            </div>
+          </div>
+
+          <form id="filterForm" class="filters">
+            <div class="field">
+              <label for="filterDate">Search by Date</label>
+              <input id="filterDate" type="date">
+            </div>
+
+            <div class="field">
+              <label for="filterType">Transaction Type</label>
+              <select id="filterType">
+                <option value="">All types</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="filterCategory">Category</label>
+              <select id="filterCategory">
+                <option value="All">All categories</option>
+              </select>
+            </div>
+
+            <button class="primary-btn" type="submit">Search</button>
+            <button id="clearFiltersBtn" class="secondary-btn" type="button">
+              Clear
+            </button>
+          </form>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th><th>Date</th><th>Type</th>
+                  <th class="right">Amount</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="transactionsTable"></tbody>
+            </table>
+          </div>
+
+          <p id="transactionTableCount" class="muted small"></p>
+        </article>
+      </section>
+
+      <section id="reportsSection" class="content-section hidden">
+        <div class="welcome-row">
+          <div>
+            <h2>Reports & Analytics</h2>
+            <p class="muted">Understand your spending patterns.</p>
+          </div>
+          <button id="exportBtn" class="secondary-btn">Export CSV</button>
+        </div>
+
+        <div class="summary-grid">
+          <article class="summary-card income-card">
+            <div class="summary-top"><span>Total Income</span><span>↗</span></div>
+            <h2 id="reportIncome">₹0.00</h2>
+          </article>
+          <article class="summary-card expense-card">
+            <div class="summary-top"><span>Total Expenses</span><span>↘</span></div>
+            <h2 id="reportExpenses">₹0.00</h2>
+          </article>
+          <article class="summary-card balance-card">
+            <div class="summary-top"><span>Net Savings</span><span>◈</span></div>
+            <h2 id="reportSavings">₹0.00</h2>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel">
+            <div class="panel-heading"><h3>Spending by Category</h3></div>
+            <div class="chart-wrap"><canvas id="reportCategoryChart"></canvas></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading"><h3>Income and Expenses</h3></div>
+            <div class="chart-wrap"><canvas id="reportBarChart"></canvas></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="categorySection" class="content-section hidden">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <h3>Expenses by Category</h3>
+              <p class="muted">A breakdown of your spending.</p>
+            </div>
+          </div>
+          <div id="categoryBreakdown" class="category-list"></div>
+        </article>
+      </section>
+
+      <footer class="footer"></footer>
+    </main>
+  </div>
+</body>
+</html>
